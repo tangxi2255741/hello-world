@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration  status="INFO"><!-- 控制系统信息的输出级别-->
+    <properties>
+        <property name="patternLayout">%d %-5p %X{TID} (%c{0}:%L) - %m%n</property>
+        <property name="LOG_PATH">/export/Logs/earthly.b2b.jd.com</property>
+        <property name="sizeMB">1024MB</property>
+        <property name="rolloverMax">10</property>
+    </properties>
+
+    <Appenders>
+        <Console name="STD_OUT" target="SYSTEM_OUT"><!-- 将日志信息从控制台输出 -->
+            <patternLayout pattern="${patternLayout}" />
+        </Console>
+        <!--
+        RollingRandomAccessFile 可以按照日志名称的格式进行定期备份，拥有一定的备份策略。
+        fileName  指定当前日志文件的位置和文件名称
+        filePattern  指定当发生Rolling时，文件的转移和重命名规则
+        -->
+        <RollingRandomAccessFile name="FILE"
+                                 fileName="${LOG_PATH}/earthly.log" filePattern="${LOG_PATH}/earthly_%d{yyyyMMdd}_%i.log"
+                                 immediateFlush="false" append="true">
+            <patternLayout pattern="${patternLayout}" />
+            <!-- 备份策略:
+            TimeBasedTriggeringPolicy 按时间备份
+            SizeBasedTriggeringPolicy 按文件大小备份
+            -->
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${sizeMB}" />
+            </Policies>
+            <!--默认的备份策略:
+            max:最多保留的日志数量
+            -->
+            <DefaultRolloverStrategy max="${rolloverMax}" />
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <root level="Info">
+            <appender-ref ref="STD_OUT" />
+        </root>
+    </Loggers>
+</Configuration>
